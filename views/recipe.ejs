@@ -1,0 +1,55 @@
+<h1>Recipe</h1>
+<% if(recipe !== null) { %>
+    <!-- If a recipe is found, display its details -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" style="text-decoration: none;">Recipe</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= recipe.name %></li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Display recipe image -->
+        <div class="col-12 col-md-4">
+            <img src="/uploads/<%- recipe.image %>" style="top: 20px;" alt="<%- recipe.image %>" class="img-fluid sticky-top" loading="lazy">
+        </div>
+
+        <!-- Display recipe details -->
+        <div class="col-12 col-md-8">
+            <div class="row">
+                <!-- Recipe name -->
+                <div class="col-12">
+                    <h1><%= recipe.name %></h1>
+                </div>
+
+                <!-- Recipe category and description -->
+                <div class="col-12 mb-4">
+                    <i class="bi bi-tag"></i>
+                    <%- recipe.category %>
+                    <br><br>
+                    <%- recipe.description %>
+                </div>
+
+                <!-- Recipe ingredients -->
+                <div class="col-12">
+                    <h4>Ingredients</h4>
+                    <ul class="list-group list-group-flush">
+                        <% recipe.ingredients.forEach(function(ingredient, index) { %>
+                            <li class="list-group-item"><%= ingredient %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+
+                <!-- Recipe cooking instructions -->
+                <div class="col-12" style="white-space: pre-line;">
+                    <h4>Cooking Instructions</h4>
+                    <%- recipe.instructions %>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+<% } else { %>
+    <!-- If no recipe is found, display a message -->
+    <p>No Items Found</p>
+<% } %>
