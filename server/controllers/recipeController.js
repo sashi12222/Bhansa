@@ -1,5 +1,7 @@
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
+const User = require('../models/User'); // Adjust the path based on the actual location of your user model file
+
 dotenv.config();
 
 // Create MySQL connection pool
@@ -64,7 +66,7 @@ module.exports = {
             handleRenderError(res, error);
         }
     },
-
+    
     async exploreCategoriesById(req, res) {
         try {
             let categoryId = req.params.id;
@@ -135,39 +137,86 @@ module.exports = {
 
     async signupPost(req, res) {
         try {
-            // Handle user registration
+            const { name, email, password, description } = req.body;
+    
+            // Check if any required fields are missing
+            if (!name || !email || !password || !description) {
+                throw new Error('All fields are required');
+            }
+    
+            // Check if the user already exists
+            const existingUser = await User.findByEmail(email);
+            if (existingUser) {
+                throw new Error('User already exists');
+            }
+    
+            // Create a new user
+            await User.create(name, email, password, description);
+    
+            // Redirect to a success page or homepage
+            res.redirect('/login');
         } catch (error) {
+            // If an error occurs during registration, handle it appropriately
             handleRenderError(res, error);
         }
     },
-
+    
     async signUp(req, res) {
         try {
-            res.render('signup', { title: 'Cooking Blog - Sign Up' });
+            const infoSubmitObj = ''; // Initialize with appropriate value if needed
+            const infoErrorsObj = ''; // Initialize with appropriate value if needed
+            res.render('signup', { title: 'Cooking Blog - Sign Up', infoSubmitObj, infoErrorsObj });
         } catch (error) {
             handleRenderError(res, error);
         }
     },
-
+    
+    
     async signIn(req, res) {
         try {
-            res.render('signin', { title: 'Cooking Blog - Sign In' });
+            // Assuming you have logic to determine success/error messages
+            const infoSubmitObj = ''; // Initialize with appropriate value if needed
+            const infoErrorsObj = ''; // Initialize with appropriate value if needed
+            res.render('signin', { title: 'Cooking Blog - Sign In', infoSubmitObj, infoErrorsObj });
         } catch (error) {
             handleRenderError(res, error);
         }
     },
+    
+    
 
     async signinPost(req, res) {
         try {
-            // Handle user authentication
+            // Extract user credentials from the request body
+            const { email, password } = req.body;
+    
+            // Assuming you have a database where user information is stored
+            // Check if the user with the provided email exists
+            const user = await User.findByEmail(email);
+    
+            // If user not found or password doesn't match, display error message
+            if (!user || !bcrypt.compareSync(password, user.hash_password)) {
+                const infoErrorsObj = [{ message: 'Invalid email or password. Please try again.' }];
+                return res.render('signin', { title: 'Cooking Blog - Sign In', infoErrorsObj });
+            }
+    
+            // If credentials are valid, set user session and redirect to home page or dashboard
+            req.session.user = user; // Assuming you're using express-session for session management
+            res.redirect('/'); // Redirect to home page or dashboard after successful login
         } catch (error) {
             handleRenderError(res, error);
         }
     },
+    
+    
+    
+    
 
+    // Additional controller methods
     async allRecipes(req, res) {
         try {
-            // Fetch all recipes
+            const recipes = await executeQuery('SELECT * FROM recipes');
+            res.render('allrecipes', { title: 'Cooking Blog - All Recipes', recipes });
         } catch (error) {
             handleRenderError(res, error);
         }

@@ -1,7 +1,6 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 
-// Create MySQL connection pool
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -12,37 +11,45 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+const handleRenderError = (res, error) => {
+  console.error('Rendering error:', error);
+  res.status(500).send({ message: 'An unexpected error occurred' });
+};
 
-// Function to execute MySQL queries
 const executeQuery = async (query, params = []) => {
-  const connection = await pool.getConnection();
   try {
-    const [rows, fields] = await connection.execute(query, params);
+    const connection = await pool.getConnection();
+    await connection.query('USE ' + process.env.DB_NAME);
+    const [rows] = await connection.execute(query, params);
+    connection.release();
     return rows;
   } catch (error) {
     throw error;
-  } finally {
-    connection.release();
   }
 };
 
-// Define User model
 const User = {
-  // Function to create a new user
   create: async (name, email, password, description) => {
-    const hash_password = await bcrypt.hash(password, 10);
+    const hashPassword = await bcrypt.hash(password, 10);
     const query = 'INSERT INTO users (name, email, hash_password, description) VALUES (?, ?, ?, ?)';
-    await executeQuery(query, [name, email, hash_password, description]);
+    await executeQuery(query, [name, email, hashPassword, description]);
   },
 
-  // Function to find a user by email
   findByEmail: async (email) => {
     const query = 'SELECT * FROM users WHERE email = ?';
     const users = await executeQuery(query, [email]);
-    return users[0]; // Assuming email is unique, return the first (and only) result
+    return users[0];
   },
 
-  // Other functions as needed
+  comparePassword: async (password, hashPassword) => {
+    return await bcrypt.compare(password, hashPassword);
+  },
+
+  findById: async (id) => {
+    const query = 'SELECT * FROM users WHERE id = ?';
+    const users = await executeQuery(query, [id]);
+    return users[0];
+  },
 };
 
 module.exports = User;

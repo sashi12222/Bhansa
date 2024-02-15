@@ -4,15 +4,16 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/" style="text-decoration: none;">Home</a></li>
         <li class="breadcrumb-item active" aria-current="page">Recipes
-            <% if(recipes && recipes.length > 0) { %>
+            <% if(recipes != '') { %>
                 (<%= recipes.length %>)
             <% } %>
+          
         </li>
     </ol>
-</nav>
+  </nav>
 
 <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
-    <% if(recipes && recipes.length > 0) { %>
+    <% if(recipes != '') { %>
         <% recipes.forEach(function(recipeItem, index){ %>
             <a href="/recipe/<%= recipeItem.id %>" class="col text-center category_link">
                 <div class="category_img category_img--large shadow">
@@ -22,8 +23,8 @@
                     <%= recipeItem.name %>
                 </div>
             </a>
-        <% }) %>
+            <% }) %>
     <% } else { %>
-        <p>No items found.</p>
+    <p>No items found.</p>
     <% } %>
 </div>
