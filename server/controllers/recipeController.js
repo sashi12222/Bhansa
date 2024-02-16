@@ -154,7 +154,7 @@ module.exports = {
             await User.create(name, email, password, description);
     
             // Redirect to a success page or homepage
-            res.redirect('/login');
+            res.redirect('/');
         } catch (error) {
             // If an error occurs during registration, handle it appropriately
             handleRenderError(res, error);
@@ -197,7 +197,8 @@ module.exports = {
             // If user not found or password doesn't match, display error message
             if (!user || !bcrypt.compareSync(password, user.hash_password)) {
                 const infoErrorsObj = [{ message: 'Invalid email or password. Please try again.' }];
-                return res.render('signin', { title: 'Cooking Blog - Sign In', infoErrorsObj });
+                res.render('signin', { title: 'Sign In', infoSubmitObj: 'Your infoSubmitObj value' });
+
             }
     
             // If credentials are valid, set user session and redirect to home page or dashboard
