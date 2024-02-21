@@ -13,12 +13,17 @@ const pool = mysql.createPool({
   
 
 // Function to execute MySQL queries
+// Function to execute MySQL queries
 const executeQuery = async (query, params = []) => {
   const connection = await pool.getConnection();
   try {
+    console.log(`Executing query: ${query}`);
+    console.log(`With parameters: ${params}`);
     const [rows, fields] = await connection.execute(query, params);
+    console.log(`Query results: ${rows}`);
     return rows;
   } catch (error) {
+    console.error(`Error executing query: ${error}`);
     throw error;
   } finally {
     connection.release();

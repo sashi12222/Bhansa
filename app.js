@@ -7,6 +7,7 @@ const path = require('path');
 const routes = require('./server/routes/recipeRoutes');
 const fileUpload = require('express-fileupload');
 const env = require('dotenv');
+// const authRoutes = require('./server/routes/authRoutes');
 const { executeQuery, handleRenderError } = require('./db'); // Import executeQuery function and handleRenderError
 
 const app = express();
@@ -25,6 +26,8 @@ app.use(session({
   resave: true
 }));
 
+
+// app.use('/', authRoutes);
 app.use(function(req, res, next) {
   res.locals.userId = req.session.userId;
   res.locals.userName = req.session.username;

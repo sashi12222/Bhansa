@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
-const User = require('../models/User'); // Adjust the path based on the actual location of your user model file
+const User = require('../models/User');
+const bcrypt = require('bcrypt');// Adjust the path based on the actual location of your user model file
 
 dotenv.config();
 
@@ -195,11 +196,10 @@ module.exports = {
             const user = await User.findByEmail(email);
     
             // If user not found or password doesn't match, display error message
-            if (!user || !bcrypt.compareSync(password, user.hash_password)) {
-                const infoErrorsObj = [{ message: 'Invalid email or password. Please try again.' }];
-                res.render('signin', { title: 'Sign In', infoSubmitObj: 'Your infoSubmitObj value' });
-
-            }
+          if (!user || !(await bcrypt.compare(password, user.hash_password))) {
+    const infoErrorsObj = [{ message: 'Invalid email or password. Please try again.' }];
+    res.render('signin', { title: 'Sign In', infoSubmitObj: 'Your infoSubmitObj value' });
+}
     
             // If credentials are valid, set user session and redirect to home page or dashboard
             req.session.user = user; // Assuming you're using express-session for session management
